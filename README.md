@@ -2,8 +2,8 @@
 
 A full-stack dashboard for exploring a historical sample of data science salaries. Users can filter records by work year, experience level, and company location, then compare salary distributions and browse individual records.
 ## Dashboard preview
-
 ![Job Market Analytics dashboard](docs/dashboard.png)
+![Job Market Analytics dashboard](docs/mediansalary.png)
 ## Dashboard features
 
 - Summary cards for salary records, median salary, job titles, and company locations
