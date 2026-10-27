@@ -10,7 +10,9 @@ A full-stack dashboard for exploring a historical sample of data science salarie
 - Most frequent job titles with record counts and median salaries
 - Searchable, paginated salary records table
 - API and database health checks
-- AI Job Title Finder using TF-IDF and cosine similarity to find similar titles in the historical dataset
+- Job-title chart showing the most frequent titles by record count
+- Yearly chart comparing median salary and record counts
+- Visual similarity bars for the AI Job Title Finder
 ## Tech stack
 
 - **Frontend:** React, TypeScript, Vite, CSS

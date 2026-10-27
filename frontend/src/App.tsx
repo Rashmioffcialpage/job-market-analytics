@@ -3,6 +3,7 @@ import SalaryRecords from './SalaryRecords'
 import './App.css'
 import LocationChart from './LocationChart'
 import JobTitleFinder from './JobTitleFinder'
+import YearChart from './YearChart'
 type SalarySummary = {
   records: number
   job_titles: number
@@ -429,7 +430,35 @@ function App() {
               Up to 10 titles ranked by matching record count.
               Small groups should be interpreted carefully.
             </p>
+{data.jobTitles.length > 0 && (
+  <div className="experience-list">
+    {data.jobTitles.map((row) => {
+      const maxRecords = Math.max(
+        ...data.jobTitles.map((item) => item.records),
+      )
 
+      return (
+        <article className="experience-row" key={row.job_title}>
+          <div className="row-heading">
+            <strong>{row.job_title}</strong>
+            <span>{row.records.toLocaleString()} records</span>
+          </div>
+
+          <div className="bar-track" aria-hidden="true">
+            <div
+              className="bar-fill"
+              style={{
+                width: `${(row.records / maxRecords) * 100}%`,
+              }}
+            />
+          </div>
+
+          <p>Median salary: {money.format(row.median_salary_usd)}</p>
+        </article>
+      )
+    })}
+  </div>
+)}
             {data.jobTitles.length === 0 ? (
               <p>No matching job-title data.</p>
             ) : (
@@ -455,7 +484,10 @@ function App() {
                 </table>
               </div>
             )}
-             </section>
+              </section>
+<YearChart key={filterQuery} query={filterQuery} />
+
+<JobTitleFinder />
 <JobTitleFinder />
 
 <LocationChart

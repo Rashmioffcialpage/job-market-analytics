@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import type { FormEvent } from 'react'
 
 type JobMatch = {
   job_title: string
@@ -24,7 +25,7 @@ export default function JobTitleFinder() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  async function findTitles(event: React.FormEvent<HTMLFormElement>) {
+  async function findTitles(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     const title = input.trim()
@@ -67,8 +68,8 @@ export default function JobTitleFinder() {
       <h2 id="title-finder-heading">AI Job Title Finder</h2>
 
       <p className="panel-description">
-        Find titles in the historical dataset with similar words.
-        Results use TF-IDF and cosine similarity.
+        Enter a title to find similar titles in the historical dataset.
+        The bars show how closely their words match your search.
       </p>
 
       <form className="filter-grid" onSubmit={findTitles}>
@@ -95,9 +96,9 @@ export default function JobTitleFinder() {
 
       {result && (
         <>
-          <p>
-            Results for <strong>{result.query}</strong>
-          </p>
+          <h3>
+            Results for “{result.query}”
+          </h3>
 
           {result.matches.length === 0 ? (
             <p>
@@ -105,37 +106,50 @@ export default function JobTitleFinder() {
               words from a job title.
             </p>
           ) : (
-            <div className="table-scroll">
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th scope="col">Job title</th>
-                    <th scope="col">Text similarity</th>
-                    <th scope="col">Records</th>
-                    <th scope="col">Median salary</th>
-                  </tr>
-                </thead>
+            <div className="experience-list">
+              {result.matches.map((match) => {
+                const percentage = Math.max(
+                  0,
+                  Math.min(100, match.similarity * 100),
+                )
 
-                <tbody>
-                  {result.matches.map((match) => (
-                    <tr key={match.job_title}>
-                      <th scope="row">{match.job_title}</th>
-                      <td>{(match.similarity * 100).toFixed(1)}%</td>
-                      <td>{match.records.toLocaleString()}</td>
-                      <td>{money.format(match.median_salary_usd)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                return (
+                  <article
+                    className="experience-row"
+                    key={match.job_title}
+                  >
+                    <div className="row-heading">
+                      <strong>{match.job_title}</strong>
+                      <span>{percentage.toFixed(1)}% text similarity</span>
+                    </div>
+
+                    <div className="bar-track" aria-hidden="true">
+                      <div
+                        className="bar-fill"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+
+                    <p>
+                      {match.records.toLocaleString()} matching dataset
+                      {' '}
+                      {match.records === 1 ? 'record' : 'records'}
+                      {' · '}
+                      Median salary: {money.format(match.median_salary_usd)}
+                    </p>
+                  </article>
+                )
+              })}
             </div>
           )}
         </>
       )}
 
       <p className="data-note">
-        Similarity compares title text; it is not a measure of skills
-        or job suitability. These results use all records in the
-        historical dataset, regardless of dashboard filters.
+        This feature uses TF-IDF and cosine similarity to compare title
+        text. It does not measure skills or job suitability. Results use
+        all records in the historical dataset, regardless of the dashboard
+        filters.
       </p>
     </section>
   )

@@ -464,3 +464,41 @@ def similar_job_titles(
         "query": title,
         "matches": matches,
     }
+@app.get("/api/salaries/years")
+def salaries_by_year(
+    filters: tuple = Depends(salary_filters),
+    db: Session = Depends(get_db),
+):
+    where, params = filters
+
+    try:
+        rows = db.execute(
+            text(f"""
+                SELECT
+                    work_year,
+                    COUNT(*) AS records,
+                    PERCENTILE_CONT(0.5) WITHIN GROUP (
+                        ORDER BY salary_in_usd
+                    ) AS median_salary_usd
+                FROM salary_records
+                {where}
+                GROUP BY work_year
+                ORDER BY work_year
+            """),
+            params,
+        ).mappings().all()
+
+    except SQLAlchemyError:
+        raise HTTPException(
+            status_code=503,
+            detail="Unable to load year breakdown",
+        ) from None
+
+    return [
+        {
+            "work_year": row["work_year"],
+            "records": row["records"],
+            "median_salary_usd": float(row["median_salary_usd"]),
+        }
+        for row in rows
+    ]

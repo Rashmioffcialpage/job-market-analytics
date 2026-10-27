@@ -109,3 +109,17 @@ def test_similar_job_titles():
     assert first_match["job_title"] == "Machine Learning Engineer"
     assert first_match["similarity"] == 1.0
     assert first_match["records"] > 0
+def test_year_breakdown_respects_filters():
+    filters = {
+        "year": 2022,
+        "experience": "EN",
+        "location": "US",
+    }
+
+    years = get_json("/api/salaries/years", filters)
+    summary = get_json("/api/salaries/summary", filters)
+
+    assert len(years) == 1
+    assert years[0]["work_year"] == 2022
+    assert years[0]["records"] == summary["records"]
+    assert years[0]["median_salary_usd"] == summary["median_salary_usd"]
