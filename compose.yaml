@@ -1,0 +1,19 @@
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: jobanalytics
+      POSTGRES_PASSWORD: local_job_dev
+      POSTGRES_DB: job_market
+    ports:
+      - "127.0.0.1:5434:5432"
+    volumes:
+      - job_market_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jobanalytics -d job_market"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  job_market_data:

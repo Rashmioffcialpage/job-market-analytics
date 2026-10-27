@@ -1,0 +1,24 @@
+# Python environment and cache
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local environment variables
+.env
+.env.*
+
+# Keep an example configuration if you add one later
+!.env.example
+
+# Frontend dependencies and build output
+node_modules/
+dist/
+
+# macOS files
+.DS_Storedata/job_salaries.csv
+# macOS files
+.DS_Store
+
+# Downloaded dataset
+data/job_salaries.csv
