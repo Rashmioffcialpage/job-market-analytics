@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import SalaryRecords from './SalaryRecords'
 import './App.css'
 import LocationChart from './LocationChart'
+import JobTitleFinder from './JobTitleFinder'
 type SalarySummary = {
   records: number
   job_titles: number
@@ -454,7 +455,13 @@ function App() {
                 </table>
               </div>
             )}
-          </section>
+             </section>
+<JobTitleFinder />
+
+<LocationChart
+  key={filterQuery}
+  query={filterQuery}
+/>
 <LocationChart
   key={filterQuery}
   query={filterQuery}

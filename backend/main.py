@@ -377,3 +377,90 @@ def salaries_by_location(
         }
         for row in rows
     ]
+@app.get("/api/salaries/similar-titles")
+def similar_job_titles(
+    title: str,
+    db: Session = Depends(get_db),
+):
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.metrics.pairwise import cosine_similarity
+
+    title = title.strip()
+
+    if not title:
+        raise HTTPException(
+            status_code=400,
+            detail="Please enter a job title.",
+        )
+
+    try:
+        rows = db.execute(
+            text("""
+                SELECT
+                    job_title,
+                    COUNT(*) AS records,
+                    PERCENTILE_CONT(0.5) WITHIN GROUP (
+                        ORDER BY salary_in_usd
+                    ) AS median_salary_usd
+                FROM salary_records
+                GROUP BY job_title
+                ORDER BY job_title
+            """)
+        ).mappings().all()
+
+    except SQLAlchemyError:
+        raise HTTPException(
+            status_code=503,
+            detail="Unable to load job titles.",
+        ) from None
+
+    if not rows:
+        return {
+            "query": title,
+            "matches": [],
+        }
+
+    titles = [row["job_title"] for row in rows]
+
+    # Fit the vocabulary on dataset titles, then compare the query
+    # against each title in the dataset.
+    vectorizer = TfidfVectorizer(ngram_range=(1, 2))
+    title_vectors = vectorizer.fit_transform(titles)
+    query_vector = vectorizer.transform([title])
+
+    scores = cosine_similarity(
+        query_vector,
+        title_vectors,
+    )[0]
+
+    ranked_indices = scores.argsort()[::-1]
+
+    matches = []
+
+    for index in ranked_indices:
+        score = float(scores[index])
+
+        # Only show titles with at least some matching words.
+        if score <= 0:
+            continue
+
+        row = rows[index]
+
+        matches.append(
+            {
+                "job_title": row["job_title"],
+                "similarity": round(score, 3),
+                "records": row["records"],
+                "median_salary_usd": float(
+                    row["median_salary_usd"]
+                ),
+            }
+        )
+
+        if len(matches) == 5:
+            break
+
+    return {
+        "query": title,
+        "matches": matches,
+    }

@@ -10,14 +10,14 @@ A full-stack dashboard for exploring a historical sample of data science salarie
 - Most frequent job titles with record counts and median salaries
 - Searchable, paginated salary records table
 - API and database health checks
-
+- AI Job Title Finder using TF-IDF and cosine similarity to find similar titles in the historical dataset
 ## Tech stack
 
 - **Frontend:** React, TypeScript, Vite, CSS
 - **Backend:** Python, FastAPI, SQLAlchemy
 - **Database:** PostgreSQL, Docker Compose
 - **Testing:** pytest
-
+- **Backend:** Python, FastAPI, SQLAlchemy, scikit-learn
 ## Dataset and limitations
 
 The project uses a historical data science salary sample with **607 records from 2020–2022**. The dashboard displays the dataset's salary values converted to USD.
@@ -122,7 +122,7 @@ The API tests connect to the running local server and use the imported dataset.
 | `/api/salaries/job-titles` | Most frequent job titles |
 | `/api/salaries/locations` | Salary breakdown by company location |
 | `/api/salaries/records` | Searchable and paginated records |
-
+| `/api/salaries/similar-titles` | Find similar job titles using text similarity |
 ## Future improvements
 
 - Add a separate dataset containing job skills

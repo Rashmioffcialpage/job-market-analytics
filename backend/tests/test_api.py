@@ -95,3 +95,17 @@ def test_invalid_page_is_rejected():
         assert error.code == 400
     else:
         raise AssertionError("Expected an HTTP 400 response for page 0")
+def test_similar_job_titles():
+    data = get_json(
+        "/api/salaries/similar-titles",
+        {"title": "machine learning engineer"},
+    )
+
+    assert data["query"] == "machine learning engineer"
+    assert len(data["matches"]) > 0
+
+    first_match = data["matches"][0]
+
+    assert first_match["job_title"] == "Machine Learning Engineer"
+    assert first_match["similarity"] == 1.0
+    assert first_match["records"] > 0
